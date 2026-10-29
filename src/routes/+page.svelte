@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { site } from '$lib/site';
+
 	// Calcul de l'expérience depuis février 2016 (figé au build car la page est prérendue : rebuilder chaque année)
 	const startDate = new Date(2016, 1); // Février 2016 (mois 1 car index 0)
 	const now = new Date();
@@ -87,10 +89,10 @@
 		{
 			name: 'Reglomatic',
 			id: 'reglomatic',
-			url: '',
-			image: '',
+			url: 'https://www.reglomatic.fr',
+			image: '/projects/reglomatic.webp',
 			description:
-				"Poser une question en langage naturel et obtenir la réponse tirée des règles d'un jeu de plateau.",
+				'Poser une question en langage naturel et obtenir la réponse tirée des règles officielles, sur plus de 100 jeux de société.',
 			tags: ['RAG', 'LLM', 'Svelte', 'Golang']
 		}
 	];
@@ -129,7 +131,37 @@
 		{ id: 'projets', label: '~/projets' },
 		{ id: 'contact', label: '~/contact' }
 	];
+
+	const pitch =
+		"Je conçois et livre des produits de bout en bout, de l'interface à l'infrastructure, de l'application mobile au LLM. Aucune limite de technologie : je choisis le bon outil et je reste à la pointe.";
+
+	// Structured data so search engines and AI tools read the profile as facts
+	const jsonLd = {
+		'@context': 'https://schema.org',
+		'@type': 'Person',
+		name: 'William Groc',
+		url: `${site}/`,
+		jobTitle: experience[0].role,
+		description: pitch,
+		email: `mailto:${contact.email}`,
+		worksFor: { '@type': 'Organization', name: experience[0].company },
+		hasCredential: {
+			'@type': 'EducationalOccupationalCredential',
+			name: 'Architecte L1 Capgemini'
+		},
+		knowsAbout: skills.flatMap((group) => group.items),
+		sameAs: [contact.github.split('?')[0]]
+	};
+	// Split closing tag so it does not end this <script> block; escape < so data cannot either
+	const jsonLdTag =
+		`<script type="application/ld+json">${JSON.stringify(jsonLd).replace(/</g, '\\u003c')}<` +
+		'/script>';
 </script>
+
+<svelte:head>
+	<!-- eslint-disable-next-line svelte/no-at-html-tags -- static data, < escaped above -->
+	{@html jsonLdTag}
+</svelte:head>
 
 <div class="relative min-h-screen overflow-x-clip bg-black text-slate-300">
 	<!-- Animated Grid Background -->
@@ -171,17 +203,15 @@
 				<p class="mb-4 flex items-center gap-2 font-mono text-sm text-emerald-400">
 					<span class="animate-pulse">▶</span> cat profile.json
 				</p>
-				<h1 class="animate-fade-in text-5xl font-bold tracking-tight text-white md:text-7xl">
-					William Groc<span class="animate-pulse text-emerald-400">_</span>
+				<h1 class="cursor animate-fade-in text-5xl font-bold tracking-tight text-white md:text-7xl">
+					William Groc
 				</h1>
 				<p class="mt-4 text-2xl font-semibold text-cyan-400 md:text-3xl">
 					Lead Développeur Fullstack
 				</p>
 				<p class="mt-2 font-mono text-emerald-400 md:text-lg">web · ia · cloud · mobile</p>
 				<p class="mt-6 max-w-2xl text-lg leading-relaxed text-slate-300">
-					Je conçois et livre des produits de bout en bout, de l'interface à l'infrastructure, de
-					l'application mobile au LLM. Aucune limite de technologie : je choisis le bon outil et je
-					reste à la pointe.
+					{pitch}
 				</p>
 				<div class="mt-8 flex flex-wrap gap-3">
 					<a href="mailto:{contact.email}" class="btn-primary">Me contacter</a>
@@ -323,26 +353,21 @@
 
 		<div class="grid gap-6 md:grid-cols-3">
 			{#each portfolio as project (project.name)}
-				<svelte:element
-					this={project.url ? 'a' : 'div'}
+				<a
 					id={project.id}
-					href={project.url || undefined}
-					target={project.url ? '_blank' : undefined}
-					rel={project.url ? 'noopener noreferrer' : undefined}
-					class="card card-flush group flex scroll-mt-16 flex-col overflow-hidden {project.url
-						? 'card-hover'
-						: ''}"
+					href={project.url}
+					target="_blank"
+					rel="noopener noreferrer"
+					class="card card-flush card-hover group flex scroll-mt-16 flex-col overflow-hidden"
 				>
-					{#if project.image}
-						<img
-							src={project.image}
-							alt="Aperçu de {project.name}"
-							width="800"
-							height="235"
-							loading="lazy"
-							class="aspect-[800/235] w-full border-b border-slate-800 object-cover"
-						/>
-					{/if}
+					<img
+						src={project.image}
+						alt="Aperçu de {project.name}"
+						width="800"
+						height="235"
+						loading="lazy"
+						class="aspect-[800/235] w-full border-b border-slate-800 object-cover"
+					/>
 					<div class="flex flex-1 flex-col p-5">
 						<div class="mb-3 flex items-center justify-between gap-2">
 							<h3
@@ -350,24 +375,20 @@
 							>
 								{project.name}
 							</h3>
-							{#if project.url}
-								<svg
-									class="h-5 w-5 text-slate-400 transition-all group-hover:translate-x-1 group-hover:text-emerald-400"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-									aria-hidden="true"
-								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-									/>
-								</svg>
-							{:else}
-								<span class="chip text-amber-300">En développement</span>
-							{/if}
+							<svg
+								class="h-5 w-5 text-slate-400 transition-all group-hover:translate-x-1 group-hover:text-emerald-400"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+								aria-hidden="true"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+								/>
+							</svg>
 						</div>
 						<p class="mb-4 flex-1 leading-relaxed">{project.description}</p>
 						<ul class="flex flex-wrap gap-2">
@@ -376,7 +397,7 @@
 							{/each}
 						</ul>
 					</div>
-				</svelte:element>
+				</a>
 			{/each}
 		</div>
 	</section>
@@ -608,10 +629,18 @@
 		background: linear-gradient(to bottom, rgb(16 185 129 / 0.5), transparent);
 	}
 
+	/* Decorative cursor in CSS so it stays out of the heading text */
+	.cursor::after {
+		content: '_' / '';
+		color: rgb(52 211 153);
+		animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+	}
+
 	@media (prefers-reduced-motion: reduce) {
 		.grid-background,
 		.scan-line,
 		.animate-fade-in,
+		.cursor::after,
 		:global(.animate-pulse) {
 			animation: none;
 		}

@@ -1,20 +1,20 @@
 <script lang="ts">
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';
+	import { site } from '$lib/site';
 
 	let { children } = $props();
 
 	const title = 'William Groc – Lead Développeur Fullstack · Web, IA, Cloud, Mobile';
 	const description =
 		'William Groc, Lead Développeur Fullstack et Architecte L1 chez Sogeti (Capgemini). Web, IA (LLM, RAG), Cloud et Mobile : des produits de bout en bout, sans limite de technologie.';
-	// Social previews need an absolute URL
-	const site = 'https://william-groc.fr';
 </script>
 
 <svelte:head>
 	<title>{title}</title>
 	<meta name="description" content={description} />
 	<link rel="icon" href={favicon} />
+	<link rel="canonical" href="{site}/" />
 	<meta property="og:type" content="website" />
 	<meta property="og:url" content={site} />
 	<meta property="og:title" content={title} />
