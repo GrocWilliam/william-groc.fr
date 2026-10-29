@@ -1,13 +1,13 @@
 # Stage 1: Build
-FROM node:20-alpine AS builder
+FROM node:24-alpine AS builder
 
 WORKDIR /app
 
+# Activer pnpm à la version fixée dans package.json (packageManager)
+RUN corepack enable
+
 # Copier les fichiers de dépendances
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-
-# Installer pnpm
-RUN npm install -g pnpm
 
 # Installer les dépendances
 RUN pnpm install --frozen-lockfile
@@ -16,10 +16,7 @@ RUN pnpm install --frozen-lockfile
 COPY . .
 
 # Builder l'application
-RUN pnpm build
-
-# Afficher ce qui a été généré
-RUN echo "=== Contenu de /app/build ===" && ls -la /app/build/
+RUN pnpm exec svelte-kit sync && pnpm build
 
 # Stage 2: Runtime
 FROM nginx:alpine
@@ -32,9 +29,6 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copier les fichiers buildés statiques
 COPY --from=builder /app/build /usr/share/nginx/html
-
-# Diagnostics
-RUN echo "=== Contenu de /usr/share/nginx/html ===" && ls -la /usr/share/nginx/html/ && echo "=== Fichiers HTML ===" && find /usr/share/nginx/html -name "*.html" -type f
 
 # Exposer le port
 EXPOSE 80
