@@ -94,6 +94,14 @@
 			description:
 				'Poser une question en langage naturel et obtenir la réponse tirée des règles officielles, sur plus de 100 jeux de société.',
 			tags: ['RAG', 'LLM', 'Svelte', 'Golang']
+		},
+		{
+			name: 'Budgetix',
+			url: 'https://budgetix-production.up.railway.app',
+			image: '/projects/budgetix.webp',
+			description:
+				"Savoir dès aujourd'hui combien il restera en fin de mois sur chaque compte, avec comptes communs et répartition des dépenses en couple.",
+			tags: ['SvelteKit', 'Finance']
 		}
 	];
 
